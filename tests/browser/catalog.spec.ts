@@ -5,6 +5,15 @@ let photoRequests: string[][] = [];
 test.beforeEach(async ({ page }, testInfo) => {
   photoRequests = [];
   const withPhotos = testInfo.title.includes("photo cache");
+  const profile = {
+    id: "fixture-user",
+    email: "test@example.invalid",
+    enabled: true,
+    role: "admin",
+    pseudonym: testInfo.title.includes("pseudonym")
+      ? (null as string | null)
+      : ("MONACO" as string | null),
+  };
   test.skip(
     Boolean(process.env.E2E_URL),
     "Isolated UI fixtures only run locally.",
@@ -60,7 +69,7 @@ test.beforeEach(async ({ page }, testInfo) => {
     notes: "",
   }));
   const tables: Record<string, unknown[]> = {
-    profiles: [{ ...user, enabled: true, role: "admin" }],
+    profiles: [profile],
     settings: [
       {
         id: 1,
@@ -155,6 +164,29 @@ test.beforeEach(async ({ page }, testInfo) => {
       });
     const url = new URL(route.request().url());
     if (
+      url.pathname === "/rest/v1/rpc/save_pseudonym" &&
+      route.request().method() === "POST"
+    ) {
+      const body = route.request().postDataJSON();
+      expect(Object.keys(body)).toEqual(["p_pseudonym"]);
+      const alias = body.p_pseudonym.trim().replace(/\s+/g, " ").toUpperCase();
+      if (alias === "TOKYO")
+        return route.fulfill({
+          status: 409,
+          contentType: "application/json",
+          body: JSON.stringify({
+            code: "23505",
+            message: "Ese pseudónimo ya está en uso. Elegí otro.",
+          }),
+        });
+      profile.pseudonym = alias;
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(alias),
+      });
+    }
+    if (
       withPhotos &&
       url.pathname.startsWith("/storage/v1/object/sign/product-photos") &&
       route.request().method() === "POST"
@@ -202,6 +234,46 @@ test.beforeEach(async ({ page }, testInfo) => {
       ),
     });
   });
+});
+
+test("pseudonym is required once, persists after reload and can be edited without changing permissions", async ({
+  page,
+}) => {
+  await page.goto("./#/sales");
+  await expect(
+    page.getByRole("heading", { name: "Elegí tu pseudónimo", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "Nueva venta", exact: true }),
+  ).toHaveCount(0);
+  await page.getByLabel("Pseudónimo", { exact: true }).fill("tokyo");
+  await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  await expect(page.getByRole("alert")).toContainText("ya está en uso");
+  await page.getByLabel("Pseudónimo", { exact: true }).fill("monaco");
+  await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  await expect(
+    page.getByRole("heading", { name: "Nueva venta", exact: true }),
+  ).toBeVisible();
+  await expect(page.locator(".profile-identity")).toContainText("MONACO");
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Nueva venta", exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Elegí tu pseudónimo" }),
+  ).toHaveCount(0);
+  await page
+    .getByRole("button", { name: "Cambiar pseudónimo", exact: true })
+    .click();
+  await page.getByLabel("Pseudónimo", { exact: true }).fill("moscu");
+  await page
+    .getByRole("button", { name: "Guardar pseudónimo", exact: true })
+    .click();
+  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.locator(".profile-identity")).toContainText("MOSCU");
+  await expect(page.locator(".profile-identity")).toContainText(
+    "Administrador",
+  );
 });
 
 test("photo cache batches seven items and reuses their URLs after navigation and reload", async ({

@@ -4,7 +4,7 @@ Aplicación privada de operaciones para un servidor de GTA V Roleplay. React, Vi
 
 **Aplicación:** https://reencabj.github.io/umbra/ · **Repositorio:** https://github.com/reencabj/umbra
 
-Primero elegí **Primera vez · Activar cuenta autorizada**, usá el correo administrador autorizado durante la instalación y una contraseña propia de al menos 12 caracteres. Confirmá el correo antes de ingresar. El stock es el cupo semanal de cada banda; UMBRA tiene disponibilidad ilimitada.
+Primero elegí **Activar cuenta**, usá el correo administrador autorizado durante la instalación y una contraseña propia de al menos 12 caracteres. Confirmá el correo antes de ingresar. En el primer acceso elegí tu pseudónimo (por ejemplo, MONACO): se guarda en tu perfil y se utiliza como nombre dentro del sistema. Podés cambiarlo desde tu nombre en el menú lateral. El stock es el cupo semanal de cada banda; UMBRA tiene disponibilidad ilimitada.
 
 ## Ejecutar y verificar
 

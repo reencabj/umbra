@@ -2,7 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { db } from "../lib/supabase";
 import { Field, Submit, errorMessage } from "../components/ui";
-import Logo from "../components/Logo";
+import AuthLayout from "../components/AuthLayout";
 export default function Recovery({ onDone }: { onDone: () => void }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -27,10 +27,11 @@ export default function Recovery({ onDone }: { onDone: () => void }) {
     }
   };
   return (
-    <div className="access-error">
-      <Logo className="auth-logo" />
-      <form className="login-form" onSubmit={(e) => void save(e)}>
-        <h2>Elegí tu nueva contraseña</h2>
+    <AuthLayout
+      title="Elegí tu nueva contraseña"
+      description="Usá al menos 12 caracteres para proteger tu cuenta."
+    >
+      <form className="auth-form" onSubmit={(e) => void save(e)}>
         <Field label="Nueva contraseña">
           <input
             type="password"
@@ -53,6 +54,6 @@ export default function Recovery({ onDone }: { onDone: () => void }) {
         </Field>
         <Submit busy={busy} label="Actualizar contraseña" />
       </form>
-    </div>
+    </AuthLayout>
   );
 }

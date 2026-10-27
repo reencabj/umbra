@@ -299,8 +299,13 @@ export default function Settings() {
               {data.users.map((u) => (
                 <div key={u.email}>
                   <div>
-                    <b>{u.email}</b>
+                    <b>
+                      {data.profiles.find((p) => p.email === u.email)
+                        ?.pseudonym || u.email}
+                    </b>
                     <small>
+                      {data.profiles.find((p) => p.email === u.email)
+                        ?.pseudonym && <>{u.email} · </>}
                       {u.role === "admin" ? "Administrador" : "Operador"} ·{" "}
                       {u.enabled ? "Habilitado" : "Deshabilitado"}
                     </small>

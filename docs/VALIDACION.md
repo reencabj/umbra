@@ -2,6 +2,13 @@
 
 Fecha: 27/10/2026. Regla vigente confirmada por el usuario: UMBRA tiene disponibilidad ilimitada; el stock es el cupo semanal de cada banda.
 
+## Pseudónimos y acceso
+
+- El primer ingreso requiere elegir un pseudónimo de 3 a 24 caracteres, guardado en el perfil y normalizado a mayúsculas. La base impide nombres duplicados y valida el formato. Cada persona puede modificar únicamente su propio nombre mediante una función protegida; los roles, el correo y la autorización permanecen protegidos.
+- El nombre aparece en el menú, las iniciales y la administración de usuarios. Puede editarse desde el perfil del menú lateral. Los miembros existentes eligen su nombre en su próximo acceso a la versión nueva; no se asignaron nombres inventados.
+- Acceso, recuperación y elección de nombre comparten una tarjeta alineada. Se verificaron el centrado y los anchos del formulario en 1920×1080, y la visualización en 390×844.
+- Pasaron 25 pruebas unitarias, las invariantes PostgreSQL y siete pruebas locales de navegador. La prueba nueva cubre nombre obligatorio, rechazo de duplicados, persistencia al recargar y edición posterior. Las validaciones de pseudónimos también pasaron en Supabase dentro de una transacción finalizada con ROLLBACK, sin cuentas de prueba persistentes.
+
 ## Carga de fotografías
 
 - Las siete fotos operativas ya estaban optimizadas a WebP y sumaban unos 18 KB. Cada montaje del componente solicitaba un enlace firmado por foto, cambiando la URL de caché. La prueba local reprodujo 14 peticiones individuales durante el montaje con React StrictMode.
@@ -48,4 +55,3 @@ Limpieza completada y consultada en la base: cero cuentas temporales, cero fotos
 - La importación histórica es opcional y no se ejecuta sobre los datos operativos durante las pruebas.
 - El asesor de seguridad de Supabase señala que la protección adicional contra contraseñas filtradas está desactivada. Supabase la ofrece desde el plan Pro: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection. Se exige contraseña de al menos 12 caracteres y correo confirmado. No se contrató un plan pago.
 - Las tablas antiguas de existencias físicas se conservan por compatibilidad y auditoría, pero no limitan nuevas ventas ni se ofrecen en la operación actual.
-

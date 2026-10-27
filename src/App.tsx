@@ -29,9 +29,11 @@ import { db, recoveryLink } from "./lib/supabase";
 import Recovery from "./pages/Recovery";
 import { today, localDate } from "./lib/domain";
 import { useApp, Provider } from "./state";
-import { Spinner } from "./components/ui";
+import { Spinner, Modal } from "./components/ui";
 import Login from "./pages/Login";
 import Logo from "./components/Logo";
+import AuthLayout from "./components/AuthLayout";
+import PseudonymForm from "./components/PseudonymForm";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Sales = lazy(() => import("./pages/Sales"));
 const Orders = lazy(() => import("./pages/Orders"));
@@ -53,6 +55,7 @@ const links = [
 function Shell() {
   const { session, profile, data, loading, error, reload } = useApp();
   const [mobile, setMobile] = useState(false);
+  const [editPseudonym, setEditPseudonym] = useState(false);
   const [recover, setRecover] = useState(recoveryLink);
   useEffect(() => {
     const {
@@ -83,6 +86,22 @@ function Shell() {
         </div>
       </div>
     );
+  if (!profile?.pseudonym)
+    return (
+      <AuthLayout
+        title="Elegí tu pseudónimo"
+        description="Así te van a identificar dentro de UMBRA."
+      >
+        <PseudonymForm />
+        <button
+          className="text-link auth-signout"
+          onClick={() => void db.auth.signOut()}
+        >
+          Cerrar sesión
+        </button>
+      </AuthLayout>
+    );
+  const initials = profile.pseudonym.slice(0, 2);
   return (
     <div className="app-shell">
       {mobile && (
@@ -119,13 +138,20 @@ function Shell() {
         </nav>
         <div className="sidebar-bottom">
           <div className="user-profile">
-            <span className="avatar">
-              {profile?.email.slice(0, 2).toUpperCase()}
-            </span>
-            <div>
-              <b>{profile?.role === "admin" ? "Administrador" : "Operador"}</b>
-              <small>{profile?.email}</small>
-            </div>
+            <button
+              className="profile-identity"
+              aria-label="Cambiar pseudónimo"
+              title={profile.email}
+              onClick={() => setEditPseudonym(true)}
+            >
+              <span className="avatar">{initials}</span>
+              <span>
+                <b>{profile.pseudonym}</b>
+                <small>
+                  {profile.role === "admin" ? "Administrador" : "Operador"}
+                </small>
+              </span>
+            </button>
             <button
               className="icon-button"
               title="Cerrar sesión"
@@ -187,9 +213,7 @@ function Shell() {
           >
             <RefreshCw size={17} />
           </button>
-          <span className="avatar small-avatar">
-            {profile?.email.slice(0, 2).toUpperCase()}
-          </span>
+          <span className="avatar small-avatar">{initials}</span>
         </header>
         <main>
           {error && (
@@ -216,6 +240,17 @@ function Shell() {
           </Suspense>
         </main>
       </div>
+      {editPseudonym && (
+        <Modal
+          title="Cambiar pseudónimo"
+          onClose={() => setEditPseudonym(false)}
+        >
+          <PseudonymForm
+            onDone={() => setEditPseudonym(false)}
+            onCancel={() => setEditPseudonym(false)}
+          />
+        </Modal>
+      )}
     </div>
   );
 }

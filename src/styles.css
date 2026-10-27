@@ -2753,6 +2753,142 @@ nav a.active {
 .login-lock {
   display: none;
 }
+.auth-page {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: grid;
+  place-items: center;
+  padding: 36px 20px;
+  background: #0c0c0c;
+}
+.auth-card {
+  width: 100%;
+  max-width: 440px;
+  padding: 34px 36px 26px;
+  border: 1px solid #2d2d2d;
+  border-radius: 14px;
+  background: #141414;
+  box-shadow: 0 16px 48px #00000020;
+}
+.auth-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 28px;
+}
+.auth-header .auth-logo {
+  width: 80px;
+  height: 80px;
+  margin-bottom: 22px;
+}
+.auth-header h1 {
+  font-size: 24px;
+  line-height: 1.3;
+  letter-spacing: -0.7px;
+}
+.auth-header p {
+  margin-top: 9px;
+  color: #a0a0a0;
+  font-size: 12px;
+  line-height: 1.65;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  width: 100%;
+}
+.auth-form .field {
+  gap: 8px;
+}
+.auth-form .field > label {
+  color: #c5c5c5;
+  font-size: 12px;
+}
+.auth-form input {
+  width: 100%;
+  min-height: 44px;
+  background: #101010;
+  padding: 11px 13px;
+  font-size: 13px;
+}
+.auth-form .btn {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 3px;
+}
+.auth-form .inline-error {
+  margin: 0;
+}
+.auth-actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 25px;
+  padding-top: 21px;
+  border-top: 1px solid #2a2a2a;
+}
+.auth-actions.single {
+  justify-content: center;
+}
+.auth-actions .text-link {
+  font-size: 11px;
+}
+.auth-signout {
+  display: block;
+  margin: 22px auto 0;
+  font-size: 11px;
+}
+.profile-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  color: inherit;
+}
+.profile-identity > span:last-child {
+  min-width: 0;
+}
+.profile-identity b {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 125px;
+}
+.profile-identity:hover b {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+@media (max-width: 480px) {
+  .auth-page {
+    padding: 22px 16px;
+  }
+  .auth-card {
+    padding: 27px 23px 23px;
+    border-radius: 12px;
+  }
+  .auth-header {
+    margin-bottom: 25px;
+  }
+  .auth-header .auth-logo {
+    width: 72px;
+    height: 72px;
+    margin-bottom: 18px;
+  }
+  .auth-header h1 {
+    font-size: 23px;
+  }
+  .auth-actions {
+    gap: 12px;
+  }
+}
 @media (max-width: 760px) {
   .sales-catalog .product-grid {
     grid-template-columns: repeat(3, minmax(0, 1fr));

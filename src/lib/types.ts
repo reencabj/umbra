@@ -5,6 +5,7 @@ export interface Profile {
   email: string;
   role: "admin" | "operator";
   enabled: boolean;
+  pseudonym: string | null;
 }
 export interface Settings {
   id: number;
@@ -130,6 +131,7 @@ export interface AuthorizedUser {
   enabled: boolean;
 }
 export interface Data {
+  profiles: Profile[];
   settings: Settings;
   categories: Category[];
   products: Product[];

@@ -25,6 +25,19 @@ test("live Supabase: dynamic products, private photos, sales, tickets, edits, sh
   await page.getByLabel("Contraseña", { exact: true }).fill(account.password);
   await page.getByRole("button", { name: "Ingresar", exact: true }).click();
   await expect(
+    page.getByRole("heading", { name: /^(Dashboard|Elegí tu pseudónimo)$/ }),
+  ).toBeVisible({ timeout: 30000 });
+  if (
+    await page
+      .getByRole("heading", { name: "Elegí tu pseudónimo", exact: true })
+      .isVisible()
+  ) {
+    await page
+      .getByLabel("Pseudónimo", { exact: true })
+      .fill("QA" + account.id.slice(0, 8).toUpperCase());
+    await page.getByRole("button", { name: "Continuar", exact: true }).click();
+  }
+  await expect(
     page.getByRole("heading", { name: "Dashboard", exact: true }),
   ).toBeVisible({ timeout: 30000 });
   await page.getByRole("link", { name: "Organizaciones", exact: true }).click();

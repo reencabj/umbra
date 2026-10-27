@@ -6,6 +6,14 @@ insert into auth.users(id,email) values('11111111-1111-4111-8111-111111111111','
 select set_config('request.jwt.claim.sub','11111111-1111-4111-8111-111111111111',true);
 set local role authenticated;
 select pg_temp.assert_ok(private.is_admin(),'admin authorization');
+select pg_temp.assert_ok((select pseudonym is null from public.profiles where id=auth.uid()),'new member starts without a pseudonym');
+select pg_temp.assert_ok(public.save_pseudonym('  monaco  ')='MONACO','normalize and save own pseudonym');
+select pg_temp.assert_ok(public.save_pseudonym('MONACO')='MONACO','pseudonym save is idempotent');
+do $$ declare blocked boolean:=false; begin
+ begin perform public.save_pseudonym('<script>'); exception when invalid_parameter_value then blocked:=true;end;
+ perform pg_temp.assert_ok(blocked,'invalid pseudonym blocked by database');
+ perform pg_temp.assert_ok((select role='admin' and enabled and email='test-admin@example.invalid' from public.profiles where id=auth.uid()),'pseudonym never changes role email or authorization');
+end $$;
 select pg_temp.assert_ok(public.week_start('2026-10-26 02:59:59+00')='2026-10-19 03:00:00+00','Sunday before midnight Argentina');
 select pg_temp.assert_ok(public.week_start('2026-10-26 03:00:00+00')='2026-10-26 03:00:00+00','Monday reset Argentina');
 create temporary table test_baseline as select (select coalesce(sum(physical_stock),0) from public.products) stock, (select count(*) from public.inventory_movements) movements;
@@ -72,6 +80,14 @@ select pg_temp.assert_ok((select count(*)=0 from public.orders where historical 
 select set_config('request.jwt.claim.sub','22222222-2222-4222-8222-222222222222',true);
 set local role authenticated;
 select pg_temp.assert_ok(private.is_member() and not private.is_admin(),'operator role');
+do $$ declare blocked boolean:=false; changed int:=0;begin
+ begin perform public.save_pseudonym('monaco');exception when unique_violation then blocked:=true;end;
+ perform pg_temp.assert_ok(blocked,'pseudonyms unique across users and letter case');
+ perform pg_temp.assert_ok(public.save_pseudonym(' tokyo ')='TOKYO','operator can choose own pseudonym');
+ perform pg_temp.assert_ok((select pseudonym='MONACO' from public.profiles where id='11111111-1111-4111-8111-111111111111'),'operator cannot change another member pseudonym');
+ begin update public.profiles set role='admin',pseudonym='MOSCU' where id=auth.uid();get diagnostics changed=row_count;exception when insufficient_privilege then changed:=0;end;
+ perform pg_temp.assert_ok(changed=0,'direct profile mutations remain blocked');
+end $$;
 do $$declare blocked boolean:=false;begin
  begin perform public.adjust_stock((select id from public.products limit 1),1,'Unauthorized');exception when insufficient_privilege then blocked:=true;end;
  perform pg_temp.assert_ok(blocked,'operator cannot mutate inventory');
@@ -84,6 +100,10 @@ update public.authorized_users set enabled=false where email='test-operator@exam
 set local role authenticated;
 select pg_temp.assert_ok(not private.is_member(),'immediate revocation even with stale JWT');
 select pg_temp.assert_ok((select count(*)=0 from public.orders),'revoked user cannot read sales');
+do $$declare blocked boolean:=false;begin
+ begin perform public.save_pseudonym('MOSCU');exception when insufficient_privilege then blocked:=true;end;
+ perform pg_temp.assert_ok(blocked,'revoked user cannot change pseudonym');
+end $$;
 reset role;
 select set_config('request.jwt.claim.sub','',true);
 set local role anon;
@@ -92,6 +112,8 @@ do $$ declare blocked boolean:=false;begin
  perform pg_temp.assert_ok(blocked,'anonymous sales access denied');
  blocked:=false;begin perform public.save_order('{}');exception when insufficient_privilege then blocked:=true;end;
  perform pg_temp.assert_ok(blocked,'anonymous RPC denied');
+ blocked:=false;begin perform public.save_pseudonym('MOSCU');exception when insufficient_privilege then blocked:=true;end;
+ perform pg_temp.assert_ok(blocked,'anonymous pseudonym access denied');
 end $$;
 reset role;
 select 'ALL DATABASE ASSERTIONS PASSED' as result;

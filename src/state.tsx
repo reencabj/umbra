@@ -80,7 +80,7 @@ export function Provider({ children }: { children: ReactNode }) {
         "inventory_movements",
         "stock",
         "weekly_usage",
-        ...(p.role === "admin" ? ["authorized_users"] : []),
+        ...(p.role === "admin" ? ["authorized_users", "profiles"] : []),
       ];
       const all = await Promise.all(tables.map((t) => rows(t)));
       const mapped = Object.fromEntries(tables.map((t, i) => [t, all[i]]));
@@ -92,6 +92,7 @@ export function Provider({ children }: { children: ReactNode }) {
         )
         .catch(() => undefined);
       setData({
+        profiles: mapped.profiles || [p],
         settings: mapped.settings[0],
         categories: mapped.categories,
         products: mapped.products,
