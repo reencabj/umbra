@@ -146,7 +146,9 @@ function Shell() {
             <Menu size={22} />
           </button>
           <div className="breadcrumb">
-            UMBRA<span>/</span>
+            <Logo className="mobile-brand" decorative />
+            <span className="breadcrumb-brand">UMBRA</span>
+            <span>/</span>
             <b>
               {links.find((l) => l.to === location.pathname)?.name ||
                 "Operaciones"}

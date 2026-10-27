@@ -267,6 +267,7 @@ test("mobile catalog keeps three compact columns and a reachable menu", async ({
     page.getByRole("heading", { name: "Nueva venta", exact: true }),
   ).toBeVisible();
   await page.getByLabel("Organización", { exact: true }).selectOption("org-0");
+  await expect(page.locator(".topbar .umbra-logo")).toBeVisible();
   const first = await page.locator(".product-card").nth(0).boundingBox();
   const third = await page.locator(".product-card").nth(2).boundingBox();
   expect(first!.y).toBe(third!.y);

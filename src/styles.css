@@ -504,6 +504,19 @@ nav kbd {
   width: 64px;
   height: 64px;
 }
+.umbra-logo.mobile-brand {
+  display: none;
+}
+@media (max-width: 760px) {
+  .umbra-logo.mobile-brand {
+    display: block;
+    width: 26px;
+    height: 26px;
+  }
+  .breadcrumb-brand {
+    display: none;
+  }
+}
 .breadcrumb {
   display: flex;
   gap: 12px;

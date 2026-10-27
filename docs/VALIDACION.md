@@ -4,7 +4,7 @@ Fecha: 27/10/2026. Regla vigente confirmada por el usuario: UMBRA tiene disponib
 
 ## Revisión visual y de cupos
 
-- Logo original del titular incorporado, conservando transparencia y proporciones, en acceso, recuperación, barra lateral, comprobantes y sus PNG, favicon y acceso directo móvil. Cinco pruebas de navegador locales pasaron; incluyen carga real de la imagen, ruta del favicon y exportación PNG con logo.
+- Logo original del titular incorporado, conservando transparencia y proporciones, en acceso, recuperación, barra lateral, cabecera móvil, comprobantes y sus PNG, favicon y acceso directo móvil. Cinco pruebas de navegador locales pasaron; incluyen carga real de la imagen, ruta del favicon y exportación PNG con logo.
 
 - Interfaz en escala de grises, marca UMBRA sin subtítulos de RP y una sola sección Stock semanal. El enlace antiguo de inventario redirige a esa sección.
 - Ítems compactos con imagen cuadrada de 64 px en escritorio y 52 px en celular, precio unitario y controles de cantidad. Tres columnas en celular de 390 px, sin desbordamiento horizontal.
