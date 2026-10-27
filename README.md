@@ -1,6 +1,6 @@
 # UMBRA — Ventas y stock semanal RP
 
-Aplicación privada de operaciones para un servidor de GTA V Roleplay. React, Vite, TypeScript, Tailwind CSS, Lucide, Recharts y Supabase. Interfaz en español, tema oscuro, responsive y navegación mediante hash compatible con GitHub Pages.
+Aplicación privada de operaciones para un servidor de GTA V Roleplay. React, Vite, TypeScript, Tailwind CSS, Lucide, Recharts y Supabase. Interfaz en español y escala de grises, responsive y navegación mediante hash compatible con GitHub Pages. Una sola sección **Stock semanal** reúne los consumos, límites y excepciones de cada banda.
 
 **Aplicación:** https://reencabj.github.io/umbra/ · **Repositorio:** https://github.com/reencabj/umbra
 
@@ -19,7 +19,7 @@ npm run check
 npm run test:e2e
 ```
 
-`npm run check` ejecuta 12 pruebas unitarias, las invariantes PostgreSQL en PGlite y la compilación TypeScript/Vite. `npm run test:e2e` comprueba el acceso privado y la navegación responsive. El caso E2E completo se habilita solo con `E2E_LIVE=1` y una cuenta temporal expresamente autorizada, suministrada localmente en `work/qa-account.json`. No se guardan credenciales de prueba en GitHub.
+`npm run check` ejecuta 18 pruebas unitarias, las invariantes PostgreSQL en PGlite y la compilación TypeScript/Vite. `npm run test:e2e` comprueba el acceso privado, la navegación responsive y el catálogo compacto con bloqueo preventivo de cupos. El caso E2E completo se habilita solo con `E2E_LIVE=1` y una cuenta temporal expresamente autorizada, suministrada localmente en `work/qa-account.json`. No se guardan credenciales de prueba en GitHub.
 
 ## Base de datos y seguridad
 

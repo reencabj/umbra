@@ -15,7 +15,7 @@ import {
   Submit,
   errorMessage,
 } from "../components/ui";
-export default function Limits({ inventory = false }: { inventory?: boolean }) {
+export default function Limits() {
   const { data: d, profile, reload } = useApp();
   const data = d!;
   const [org, setOrg] = useState("all");
@@ -68,12 +68,8 @@ export default function Limits({ inventory = false }: { inventory?: boolean }) {
   return (
     <>
       <PageTitle
-        title={inventory ? "Stock semanal por banda" : "Límites semanales"}
-        description={
-          inventory
-            ? "UMBRA tiene disponibilidad ilimitada. Este stock indica cuánto puede comprar cada organización durante la semana."
-            : "Configurá los cupos compartidos por categoría y las excepciones por organización."
-        }
+        title="Stock semanal"
+        description="Cupo compartido por categoría para cada organización."
         action={
           admin && (
             <div className="row-actions">

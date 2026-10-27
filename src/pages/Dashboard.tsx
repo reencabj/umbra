@@ -87,7 +87,6 @@ export default function Dashboard() {
     <>
       <PageTitle
         title="Dashboard"
-        description="Una visión clara de tus operaciones, en tiempo real."
         action={
           <Link className="btn primary" to="/sales">
             <Plus size={17} />
@@ -168,26 +167,26 @@ export default function Dashboard() {
               >
                 <defs>
                   <linearGradient id="revenue-fill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor="#00db8b" stopOpacity={0.2} />
-                    <stop offset="100%" stopColor="#00db8b" stopOpacity={0} />
+                    <stop offset="0%" stopColor="#a7a7a7" stopOpacity={0.2} />
+                    <stop offset="100%" stopColor="#a7a7a7" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid
                   vertical={false}
-                  stroke="#242b31"
+                  stroke="#2a2a2a"
                   strokeDasharray="3 4"
                 />
                 <XAxis
                   dataKey="date"
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#7d8996", fontSize: 11 }}
+                  tick={{ fill: "#878787", fontSize: 11 }}
                   minTickGap={35}
                 />
                 <YAxis
                   axisLine={false}
                   tickLine={false}
-                  tick={{ fill: "#7d8996", fontSize: 11 }}
+                  tick={{ fill: "#878787", fontSize: 11 }}
                   tickFormatter={(v) =>
                     v >= 1000000
                       ? `${v / 1000000}M`
@@ -198,8 +197,8 @@ export default function Dashboard() {
                 />
                 <Tooltip
                   contentStyle={{
-                    background: "#171d23",
-                    border: "1px solid #303942",
+                    background: "#1c1c1c",
+                    border: "1px solid #383838",
                     borderRadius: 8,
                   }}
                   formatter={(v) => money(Number(v))}
@@ -207,7 +206,7 @@ export default function Dashboard() {
                 <Area
                   type="monotone"
                   dataKey="total"
-                  stroke="#00db8b"
+                  stroke="#a7a7a7"
                   strokeWidth={2.5}
                   fill="url(#revenue-fill)"
                   name="Facturación"
@@ -239,13 +238,13 @@ export default function Dashboard() {
                       dataKey="value"
                       stroke="none"
                     >
-                      <Cell fill="#00db8b" />
-                      <Cell fill="#5e7185" />
+                      <Cell fill="#a7a7a7" />
+                      <Cell fill="#6e6e6e" />
                     </Pie>
                     <Tooltip
                       contentStyle={{
-                        background: "#171d23",
-                        border: "1px solid #303942",
+                        background: "#1c1c1c",
+                        border: "1px solid #383838",
                       }}
                       formatter={(v) => money(Number(v))}
                     />

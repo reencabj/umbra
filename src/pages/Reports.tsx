@@ -52,10 +52,7 @@ export default function Reports() {
   };
   return (
     <>
-      <PageTitle
-        title="Reportes"
-        description="Cierre diario listo para Discord y exportaciones con detalle de ventas."
-      />
+      <PageTitle title="Reportes" />
       <section className="panel report-controls">
         <div>
           <label className="label" htmlFor="report-date">

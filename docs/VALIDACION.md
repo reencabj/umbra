@@ -2,6 +2,13 @@
 
 Fecha: 27/10/2026. Regla vigente confirmada por el usuario: UMBRA tiene disponibilidad ilimitada; el stock es el cupo semanal de cada banda.
 
+## Revisión visual y de cupos
+
+- Interfaz en escala de grises, marca UMBRA sin subtítulos de RP y una sola sección Stock semanal. El enlace antiguo de inventario redirige a esa sección.
+- Ítems compactos con imagen cuadrada de 64 px en escritorio y 52 px en celular, precio unitario y controles de cantidad. Tres columnas en celular de 390 px, sin desbordamiento horizontal.
+- Los botones + de todos los productos de una categoría se bloquean al alcanzar el cupo. Las cantidades escritas se ajustan al máximo permitido; quitar unidades libera capacidad inmediatamente. Los combos que no entran completos quedan deshabilitados. Cambiar de organización o duplicar un pedido ajusta el carrito al cupo disponible.
+- 18 pruebas unitarias y las invariantes PostgreSQL pasaron. Cuatro pruebas de navegador locales pasaron, incluidas las dos nuevas pruebas de catálogo y navegación responsive con datos aislados. El caso que crea datos reales en Supabase se omite en esta revisión; la prueba completa anterior continúa documentada abajo.
+
 ## Verificado
 
 - 12 pruebas unitarias: precios blancos/negros, lavado una sola vez, redondeo entero, ventanas semanales argentinas, tickets y reportes.

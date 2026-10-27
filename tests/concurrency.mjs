@@ -39,13 +39,11 @@ try {
       .single(),
   );
   await checked(
-    db
-      .from("limit_exceptions")
-      .upsert({
-        organization_id: org.id,
-        category_id: product.category_id,
-        weekly_limit: 1,
-      }),
+    db.from("limit_exceptions").upsert({
+      organization_id: org.id,
+      category_id: product.category_id,
+      weekly_limit: 1,
+    }),
   );
   const payload = (orgId, status = "confirmed") => ({
     request_key: randomUUID(),

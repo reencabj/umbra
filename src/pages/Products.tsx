@@ -26,7 +26,6 @@ export default function Products() {
     <>
       <PageTitle
         title="Productos"
-        description="Catálogo, fotografías y precios independientes para cada método de pago."
         action={
           admin && (
             <button className="btn primary" onClick={() => setEdit(null)}>

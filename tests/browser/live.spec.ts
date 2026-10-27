@@ -51,9 +51,7 @@ test("live Supabase: dynamic products, private photos, sales, tickets, edits, sh
     .getByRole("button", { name: "Registrar contacto", exact: true })
     .click();
   await expect(page.getByRole("dialog")).toHaveCount(0);
-  await page
-    .getByRole("link", { name: "Límites semanales", exact: true })
-    .click();
+  await page.getByRole("link", { name: "Stock semanal", exact: true }).click();
   await page
     .getByRole("button", { name: "Crear categoría", exact: true })
     .click();
@@ -208,9 +206,15 @@ test("live Supabase: dynamic products, private photos, sales, tickets, edits, sh
     .selectOption({ label: org });
   await page.getByLabel("Cantidad " + beta, { exact: true }).fill("4");
   await expect(
-    page.getByRole("button", { name: "Confirmar pedido", exact: true }),
+    page.getByLabel("Cantidad " + beta, { exact: true }),
+  ).toHaveValue("3");
+  await expect(
+    page.getByRole("button", { name: "Agregar " + alpha, exact: true }),
   ).toBeDisabled();
-  await expect(page.locator(".inline-error")).toContainText("cupo de 5");
+  await expect(
+    page.getByRole("button", { name: "Agregar " + beta, exact: true }),
+  ).toBeDisabled();
+  await expect(page.locator(".inline-error")).toHaveCount(0);
   await page.evaluate(() => window.scrollTo(0, 0));
   await page.screenshot({ path: "work/qa-sales-desktop.png" });
   await page.getByRole("link", { name: "Reportes", exact: true }).click();
@@ -233,8 +237,12 @@ test("live Supabase: dynamic products, private photos, sales, tickets, edits, sh
   const workbook = new ExcelJS.Workbook();
   await workbook.xlsx.readFile((await xlsxFile.path())!);
   const exportedRows: unknown[][] = [];
-  workbook.getWorksheet("Pedidos")!.eachRow((row) => exportedRows.push(row.values as unknown[]));
-  expect(exportedRows.some((row) => row.includes(org) && row.includes(52500))).toBeTruthy();
+  workbook
+    .getWorksheet("Pedidos")!
+    .eachRow((row) => exportedRows.push(row.values as unknown[]));
+  expect(
+    exportedRows.some((row) => row.includes(org) && row.includes(52500)),
+  ).toBeTruthy();
   expect(workbook.getWorksheet("Productos")!.rowCount).toBeGreaterThan(1);
   await page.getByRole("link", { name: "Pedidos", exact: true }).click();
   await page

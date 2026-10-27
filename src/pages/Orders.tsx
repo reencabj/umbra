@@ -60,7 +60,6 @@ export default function Orders() {
     <>
       <PageTitle
         title="Pedidos"
-        description="Historial completo, comprobantes y seguimiento de cada venta."
         action={
           <Link className="btn primary" to="/sales">
             <Plus size={17} />

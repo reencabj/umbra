@@ -16,6 +16,7 @@ import type { CartLine, Payment, Status } from "../lib/types";
 import { money, totals, weekWindow, TZ } from "../lib/domain";
 import { fromZonedTime } from "date-fns-tz";
 import { rpc } from "../lib/supabase";
+import { fitCart, quantityLimit } from "../lib/cart";
 import {
   PageTitle,
   SearchBox,
@@ -152,6 +153,37 @@ export default function Sales() {
           : 0),
       0,
     );
+  const allowance = Object.fromEntries(
+    data.categories.map((c) => {
+      const cap = capFor(c.id);
+      return [c.id, cap === null ? null : Math.max(0, cap - (used[c.id] || 0))];
+    }),
+  );
+  const allowanceKey = JSON.stringify(allowance);
+  const productKey = products.map((p) => p.id + p.category_id).join();
+  useEffect(() => {
+    if (!org) return;
+    setCart((previous) => {
+      const fitted = fitCart(previous, products, allowance);
+      return JSON.stringify(fitted) === JSON.stringify(previous)
+        ? previous
+        : fitted;
+    });
+  }, [org, allowanceKey, productKey, edit?.id, source?.id]);
+  const comboCart = (items: CartLine[]) => {
+    const map = new Map(cart.map((i) => [i.product_id, i.quantity]));
+    for (const i of items)
+      map.set(i.product_id, (map.get(i.product_id) || 0) + i.quantity);
+    return [...map].map(([product_id, quantity]) => ({ product_id, quantity }));
+  };
+  const canAddCombo = (items: CartLine[]) => {
+    const candidate = comboCart(items);
+    return (
+      Boolean(selectedOrg?.active) &&
+      JSON.stringify(fitCart(candidate, products, allowance)) ===
+        JSON.stringify(candidate)
+    );
+  };
   const issues: string[] = amountError ? [amountError] : [];
   if (edit?.status === "cancelled")
     issues.push("El pedido fue anulado. Duplicalo para crear otro.");
@@ -172,23 +204,28 @@ export default function Sales() {
   if (edit?.historical && profile?.role !== "admin")
     issues.push("La corrección histórica requiere administrador.");
   function quantity(id: string, value: number) {
-    setCart((previous) =>
-      value <= 0
+    setCart((previous) => {
+      const next = Math.max(
+        0,
+        Math.min(
+          Number.isFinite(value) ? Math.floor(value) : 0,
+          quantityLimit(id, previous, products, allowance),
+        ),
+      );
+      return next <= 0
         ? previous.filter((c) => c.product_id !== id)
         : previous.some((c) => c.product_id === id)
           ? previous.map((c) =>
-              c.product_id === id
-                ? { ...c, quantity: Math.min(1000000, Math.floor(value)) }
-                : c,
+              c.product_id === id ? { ...c, quantity: next } : c,
             )
           : [
               ...previous,
               {
                 product_id: id,
-                quantity: Math.min(1000000, Math.floor(value)),
+                quantity: next,
               },
-            ],
-    );
+            ];
+    });
   }
   async function save() {
     setBusy(true);
@@ -224,17 +261,10 @@ export default function Sales() {
     <>
       <PageTitle
         title={edit ? `Editar pedido #${edit.number}` : "Nueva venta"}
-        description="Elegí una organización, armá el pedido y generá su comprobante."
-        action={
-          <span className="subtle-tag">
-            <ShieldCheck size={15} /> Validación transaccional
-          </span>
-        }
       />
       <div className="sales-layout">
         <div className="sales-catalog">
           <section className="panel sale-selection">
-            <div className="section-number">01</div>
             <div className="grow">
               <label className="label" htmlFor="sale-org">
                 Organización
@@ -279,11 +309,8 @@ export default function Sales() {
           <div className="catalog-heading">
             <div>
               <h2>
-                Catálogo de productos <span>{products.length}</span>
+                Productos <span>{products.length}</span>
               </h2>
-              <p>
-                Precios en dinero {payment === "white" ? "blanco" : "negro"}
-              </p>
             </div>
             <SearchBox
               value={search}
@@ -320,23 +347,9 @@ export default function Sales() {
                   <button
                     className="btn small"
                     key={c.id}
+                    disabled={!canAddCombo(c.items)}
                     onClick={() => {
-                      setCart((previous) => {
-                        const map = new Map(
-                          previous.map((i) => [i.product_id, i.quantity]),
-                        );
-                        c.items.forEach((i) =>
-                          map.set(
-                            i.product_id,
-                            (map.get(i.product_id) || 0) + i.quantity,
-                          ),
-                        );
-                        return [...map].map(([product_id, quantity]) => ({
-                          product_id,
-                          quantity,
-                        }));
-                      });
-                      toast.success(`Combo ${c.name} agregado`);
+                      if (canAddCombo(c.items)) setCart(comboCart(c.items));
                     }}
                   >
                     {c.name}
@@ -355,46 +368,22 @@ export default function Sales() {
               .map((p) => {
                 const count =
                   cart.find((c) => c.product_id === p.id)?.quantity || 0;
-                const cap = capFor(p.category_id);
-                const rest =
-                  cap === null
-                    ? null
-                    : Math.max(
-                        0,
-                        cap -
-                          (used[p.category_id] || 0) -
-                          cartByCategory(p.category_id),
-                      );
+                const maximum = quantityLimit(p.id, cart, products, allowance);
                 return (
                   <article
                     className={"product-card " + (count ? "in-cart" : "")}
                     key={p.id}
                   >
-                    <div className="product-image">
+                    <div className="product-image" aria-hidden="true">
                       <Photo path={p.image_path} name={p.name} />
-                      <span className="category-label">
-                        {
-                          data.categories.find((c) => c.id === p.category_id)
-                            ?.name
-                        }
-                      </span>
-                      {count > 0 && (
-                        <span className="selected-count">
-                          {count} en pedido
-                        </span>
-                      )}
                     </div>
                     <div className="product-content">
-                      <h3>{p.name}</h3>
-                      <div className="stock-note">
-                        {org
-                          ? rest === null
-                            ? "Sin límite"
-                            : `Cupo: ${rest}`
-                          : "Elegí organización"}
-                      </div>
+                      <h3 title={p.name}>{p.name}</h3>
                       <div className="product-bottom">
-                        <strong>{money(getPrice(p.id))}</strong>
+                        <div className="unit-price">
+                          <strong>{money(getPrice(p.id))}</strong>
+                          <span>/ u.</span>
+                        </div>
                         <div className="stepper">
                           <button
                             aria-label={`Quitar ${p.name}`}
@@ -407,7 +396,8 @@ export default function Sales() {
                             aria-label={`Cantidad ${p.name}`}
                             type="number"
                             min="0"
-                            max="1000000"
+                            max={maximum}
+                            disabled={!selectedOrg?.active}
                             value={count}
                             onChange={(e) =>
                               quantity(p.id, Number(e.target.value) || 0)
@@ -415,26 +405,17 @@ export default function Sales() {
                           />
                           <button
                             aria-label={`Agregar ${p.name}`}
-                            disabled={!org || rest === 0}
+                            disabled={!selectedOrg?.active || count >= maximum}
                             onClick={() => quantity(p.id, count + 1)}
                           >
                             <Plus size={14} />
                           </button>
                         </div>
                       </div>
-                      {count > 0 && (
-                        <div className="line-subtotal">
-                          Subtotal <b>{money(count * getPrice(p.id))}</b>
-                        </div>
-                      )}
                     </div>
                   </article>
                 );
               })}
-          </div>
-          <div className="info-line">
-            <ShieldCheck size={16} /> Los productos de una categoría comparten
-            el cupo semanal. Blanco y Negro consumen el mismo cupo.
           </div>
         </div>
         <aside className="panel order-summary">
@@ -473,7 +454,6 @@ export default function Sales() {
               <div className="cart-empty">
                 <ShoppingBag size={28} />
                 <p>Tu pedido está vacío</p>
-                <small>Agregá productos del catálogo.</small>
               </div>
             )}
           </div>
@@ -512,7 +492,9 @@ export default function Sales() {
           <small className="state-explanation">
             {edit?.historical
               ? "Corrección histórica: conserva la fecha original, sin inventar hora."
-              : "UMBRA: disponibilidad ilimitada. Pendientes, confirmadas y entregadas consumen el cupo semanal de la banda; anular lo libera."}
+              : status === "pending"
+                ? "Reserva cupo semanal. No suma facturación."
+                : "Consume cupo semanal."}
           </small>
           {issues.length > 0 && cart.length > 0 && (
             <div className="inline-error">
@@ -529,9 +511,6 @@ export default function Sales() {
             {edit ? "Guardar cambios" : "Confirmar pedido"}
             <ArrowRight size={17} />
           </button>
-          <div className="summary-foot">
-            Los precios quedan guardados en el pedido.
-          </div>
         </aside>
       </div>
       {confirm && (

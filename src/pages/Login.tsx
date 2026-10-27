@@ -1,11 +1,5 @@
 import { useState } from "react";
-import {
-  ArrowRight,
-  ShieldCheck,
-  Package,
-  ChartNoAxesCombined,
-  LockKeyhole,
-} from "lucide-react";
+import { ArrowRight, LockKeyhole } from "lucide-react";
 import { toast } from "sonner";
 import { db, configured } from "../lib/supabase";
 import { errorMessage, Field } from "../components/ui";
@@ -54,39 +48,8 @@ export default function Login() {
       <div className="login-brand">
         <div className="brand">
           <span className="brand-symbol">U</span>
-          <div>
-            UMBRA<small>VENTAS & CUPOS RP</small>
-          </div>
+          <div>UMBRA</div>
         </div>
-        <div className="login-copy">
-          <span className="eyebrow">CONTROL EN CADA OPERACIÓN</span>
-          <h1>
-            Menos pasos.
-            <br />
-            Más control.
-          </h1>
-          <p>
-            Ventas rápidas, stock semanal organizado y cada organización dentro
-            de su cupo.
-          </p>
-          <div>
-            <span>
-              <Package size={19} />
-              Disponibilidad ilimitada de UMBRA
-            </span>
-            <span>
-              <ShieldCheck size={19} />
-              Cupos semanales por organización
-            </span>
-            <span>
-              <ChartNoAxesCombined size={19} />
-              Reportes listos para Discord
-            </span>
-          </div>
-        </div>
-        <span className="login-foot">
-          ADMINISTRACIÓN DE OPERACIONES · GTA V ROLEPLAY
-        </span>
       </div>
       <div className="login-form-wrap">
         <form className="login-form" onSubmit={(e) => void submit(e)}>
@@ -168,9 +131,6 @@ export default function Login() {
               Olvidé mi contraseña
             </button>
           )}
-          <div className="login-secure">
-            <ShieldCheck size={14} /> Acceso privado para usuarios autorizados
-          </div>
         </form>
       </div>
     </div>

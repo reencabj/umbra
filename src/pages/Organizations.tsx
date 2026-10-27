@@ -67,7 +67,6 @@ export default function Organizations() {
     <>
       <PageTitle
         title="Organizaciones"
-        description="Contactos, historial de compras y seguimiento de cada banda."
         action={
           <button
             className="btn primary"

@@ -13,7 +13,6 @@ import {
   ShoppingBag,
   ReceiptText,
   Users,
-  Boxes,
   Package,
   SlidersHorizontal,
   ChartNoAxesCombined,
@@ -36,7 +35,6 @@ const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Sales = lazy(() => import("./pages/Sales"));
 const Orders = lazy(() => import("./pages/Orders"));
 const Organizations = lazy(() => import("./pages/Organizations"));
-const Inventory = lazy(() => import("./pages/Inventory"));
 const Products = lazy(() => import("./pages/Products"));
 const Limits = lazy(() => import("./pages/Limits"));
 const Reports = lazy(() => import("./pages/Reports"));
@@ -46,9 +44,8 @@ const links = [
   { to: "/sales", name: "Nueva venta", icon: ShoppingBag },
   { to: "/orders", name: "Pedidos", icon: ReceiptText },
   { to: "/organizations", name: "Organizaciones", icon: Users },
-  { to: "/inventory", name: "Stock semanal", icon: Boxes },
   { to: "/products", name: "Productos", icon: Package },
-  { to: "/limits", name: "Límites semanales", icon: SlidersHorizontal },
+  { to: "/limits", name: "Stock semanal", icon: SlidersHorizontal },
   { to: "/reports", name: "Reportes", icon: ChartNoAxesCombined },
   { to: "/settings", name: "Configuración", icon: Settings2 },
 ];
@@ -93,10 +90,7 @@ function Shell() {
       <aside className={"sidebar " + (mobile ? "open" : "")}>
         <div className="brand">
           <span className="brand-symbol">U</span>
-          <div>
-            {data.settings.system_name}
-            <small>VENTAS & CUPOS</small>
-          </div>
+          <div>{data.settings.system_name}</div>
           <button
             className="icon-button mobile-only"
             aria-label="Cerrar menú"
@@ -105,11 +99,10 @@ function Shell() {
             <X size={20} />
           </button>
         </div>
-        <span className="nav-label">ESPACIO DE TRABAJO</span>
         <nav>
           {links.map(({ to, name, icon: Icon }, i) => (
             <div key={to}>
-              {i === 7 && <div className="nav-separator" />}
+              {i === 6 && <div className="nav-separator" />}
               <NavLink
                 to={to}
                 aria-label={name}
@@ -124,10 +117,6 @@ function Shell() {
           ))}
         </nav>
         <div className="sidebar-bottom">
-          <div className="system-status">
-            <i />
-            Sistema conectado<span>Supabase</span>
-          </div>
           <div className="user-profile">
             <span className="avatar">
               {profile?.email.slice(0, 2).toUpperCase()}
@@ -211,7 +200,10 @@ function Shell() {
               <Route path="/sales" element={<Sales />} />
               <Route path="/orders" element={<Orders />} />
               <Route path="/organizations" element={<Organizations />} />
-              <Route path="/inventory" element={<Inventory />} />
+              <Route
+                path="/inventory"
+                element={<Navigate to="/limits" replace />}
+              />
               <Route path="/products" element={<Products />} />
               <Route path="/limits" element={<Limits />} />
               <Route path="/reports" element={<Reports />} />
@@ -220,10 +212,6 @@ function Shell() {
             </Routes>
           </Suspense>
         </main>
-        <footer className="app-footer">
-          <span>{data.settings.system_name} · Gestión de operaciones RP</span>
-          <span>America/Argentina/Buenos_Aires</span>
-        </footer>
       </div>
     </div>
   );
@@ -260,7 +248,7 @@ export default function App() {
         <HashRouter>
           <Shell />
         </HashRouter>
-        <Toaster theme="dark" richColors position="bottom-right" />
+        <Toaster theme="dark" position="bottom-right" />
       </Provider>
     </ErrorBoundary>
   );

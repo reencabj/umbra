@@ -26,15 +26,14 @@ export function PageTitle({
   action,
 }: {
   title: string;
-  description: string;
+  description?: string;
   action?: ReactNode;
 }) {
   return (
     <div className="page-title">
       <div>
-        <div className="eyebrow">OPERACIONES / {title.toUpperCase()}</div>
         <h1>{title}</h1>
-        <p>{description}</p>
+        {description && <p>{description}</p>}
       </div>
       {action}
     </div>
@@ -254,7 +253,7 @@ export function TicketModal({
       const el = document.getElementById("ticket-export")!;
       const url = await toPng(el, {
         pixelRatio: 2,
-        backgroundColor: "#101419",
+        backgroundColor: "#141414",
       });
       const a = document.createElement("a");
       a.download = `pedido-${order.number}.png`;
