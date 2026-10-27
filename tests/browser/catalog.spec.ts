@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
 
 test.beforeEach(async ({ page }) => {
   test.skip(
@@ -93,11 +94,31 @@ test.beforeEach(async ({ page }) => {
         status: "cancelled",
         payment: "white",
         notes: "",
+        number: 7,
+        organization_name: "Requiem",
+        business_date: "2026-10-27",
+        occurred_at: null,
+        subtotal: 67500,
+        washing: 0,
+        total: 67500,
+        washing_bps: 0,
       },
     ],
     order_items: [
-      { order_id: "template", product_id: "p-0", quantity: 3 },
-      { order_id: "template", product_id: "p-1", quantity: 2 },
+      {
+        order_id: "template",
+        product_id: "p-0",
+        product_name: names[0],
+        quantity: 3,
+        unit_price: 12500,
+      },
+      {
+        order_id: "template",
+        product_id: "p-1",
+        product_name: names[1],
+        quantity: 2,
+        unit_price: 15000,
+      },
     ],
     limit_exceptions: [
       { organization_id: "org-1", category_id: "cat-0", weekly_limit: 1 },
@@ -197,6 +218,13 @@ test("compact catalog blocks shared quota, typed overflow, combos and smaller or
   expect(size!.width).toBeLessThan(190);
   expect(size!.height).toBeLessThan(210);
   await expect(page).toHaveTitle("UMBRA");
+  await expect
+    .poll(() =>
+      page
+        .locator(".sidebar .umbra-logo")
+        .evaluate((img: HTMLImageElement) => img.naturalWidth),
+    )
+    .toBe(1254);
   await expect(
     page.getByRole("link", { name: "Stock semanal", exact: true }),
   ).toHaveCount(1);
@@ -209,6 +237,25 @@ test("compact catalog blocks shared quota, typed overflow, combos and smaller or
     page.getByRole("heading", { name: "Stock semanal", exact: true }),
   ).toBeVisible();
   await expect(page).toHaveURL(/#\/limits$/);
+});
+
+test("ticket includes the original logo and exports its PNG", async ({
+  page,
+}) => {
+  await page.goto("./#/orders");
+  await page.getByTitle("Ver comprobante", { exact: true }).click();
+  const logo = page.locator("#ticket-export .umbra-logo");
+  await expect(logo).toBeVisible();
+  await expect
+    .poll(() => logo.evaluate((img: HTMLImageElement) => img.naturalWidth))
+    .toBe(1254);
+  const download = page.waitForEvent("download");
+  await page.getByRole("button", { name: "PNG", exact: true }).click();
+  const png = await download;
+  await png.saveAs("work/ticket-logo.png");
+  expect(
+    (await readFile("work/ticket-logo.png")).subarray(0, 8).toString("hex"),
+  ).toBe("89504e470d0a1a0a");
 });
 
 test("mobile catalog keeps three compact columns and a reachable menu", async ({

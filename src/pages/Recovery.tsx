@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { db } from "../lib/supabase";
 import { Field, Submit, errorMessage } from "../components/ui";
+import Logo from "../components/Logo";
 export default function Recovery({ onDone }: { onDone: () => void }) {
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
@@ -27,6 +28,7 @@ export default function Recovery({ onDone }: { onDone: () => void }) {
   };
   return (
     <div className="access-error">
+      <Logo className="auth-logo" />
       <form className="login-form" onSubmit={(e) => void save(e)}>
         <h2>Elegí tu nueva contraseña</h2>
         <Field label="Nueva contraseña">

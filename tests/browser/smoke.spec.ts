@@ -5,6 +5,14 @@ test("private login and account activation render on desktop", async ({
   const errors: string[] = [];
   page.on("pageerror", (e) => errors.push(e.message));
   await page.goto("./");
+  const logo = page.getByRole("img", { name: "UMBRA", exact: true });
+  await expect(logo).toBeVisible();
+  await expect
+    .poll(() => logo.evaluate((img: HTMLImageElement) => img.naturalWidth))
+    .toBe(1254);
+  expect(await page.locator('link[rel="icon"]').getAttribute("href")).toBe(
+    "/umbra/umbra-logo.png",
+  );
   await expect(
     page.getByRole("heading", { name: "Bienvenido de nuevo" }),
   ).toBeVisible();

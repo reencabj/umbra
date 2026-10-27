@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ArrowRight, LockKeyhole } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 import { db, configured } from "../lib/supabase";
 import { errorMessage, Field } from "../components/ui";
+import Logo from "../components/Logo";
 export default function Login() {
   const [mode, setMode] = useState<"login" | "signup" | "recover">("login");
   const [email, setEmail] = useState("");
@@ -46,16 +47,10 @@ export default function Login() {
   return (
     <div className="login-page">
       <div className="login-brand">
-        <div className="brand">
-          <span className="brand-symbol">U</span>
-          <div>UMBRA</div>
-        </div>
+        <Logo className="auth-logo" />
       </div>
       <div className="login-form-wrap">
         <form className="login-form" onSubmit={(e) => void submit(e)}>
-          <div className="login-lock">
-            <LockKeyhole size={22} />
-          </div>
           <h2>
             {mode === "signup"
               ? "Activar mi cuenta"

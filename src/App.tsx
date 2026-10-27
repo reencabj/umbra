@@ -31,6 +31,7 @@ import { today, localDate } from "./lib/domain";
 import { useApp, Provider } from "./state";
 import { Spinner } from "./components/ui";
 import Login from "./pages/Login";
+import Logo from "./components/Logo";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Sales = lazy(() => import("./pages/Sales"));
 const Orders = lazy(() => import("./pages/Orders"));
@@ -89,7 +90,7 @@ function Shell() {
       )}
       <aside className={"sidebar " + (mobile ? "open" : "")}>
         <div className="brand">
-          <span className="brand-symbol">U</span>
+          <Logo decorative />
           <div>{data.settings.system_name}</div>
           <button
             className="icon-button mobile-only"

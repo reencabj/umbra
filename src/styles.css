@@ -484,6 +484,26 @@ nav kbd {
   padding: 0 32px;
   background: #121212;
 }
+.umbra-logo {
+  display: block;
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.umbra-logo.auth-logo {
+  width: 112px;
+  height: 112px;
+}
+.ticket-mark {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+.ticket-mark .umbra-logo {
+  width: 64px;
+  height: 64px;
+}
 .breadcrumb {
   display: flex;
   gap: 12px;

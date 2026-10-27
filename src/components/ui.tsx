@@ -15,6 +15,7 @@ import { money, ticket } from "../lib/domain";
 import { statusLabel } from "../lib/types";
 import type { Order } from "../lib/types";
 import { useApp } from "../state";
+import Logo from "./Logo";
 export const errorMessage = (e: unknown) =>
   e instanceof Error
     ? e.message
@@ -251,6 +252,9 @@ export function TicketModal({
     try {
       const { toPng } = await import("html-to-image");
       const el = document.getElementById("ticket-export")!;
+      await Promise.all(
+        Array.from(el.querySelectorAll("img"), (img) => img.decode()),
+      );
       const url = await toPng(el, {
         pixelRatio: 2,
         backgroundColor: "#141414",
@@ -281,8 +285,11 @@ export function TicketModal({
       </div>
       <div id="ticket-export" className="ticket">
         <div className="ticket-mark">
-          {data!.settings.system_name}
-          <span>COMPROBANTE DE VENTA</span>
+          <Logo decorative />
+          <div>
+            {data!.settings.system_name}
+            <span>COMPROBANTE DE VENTA</span>
+          </div>
         </div>
         <pre>{text}</pre>
         <div className="ticket-total">{money(order.total)}</div>
