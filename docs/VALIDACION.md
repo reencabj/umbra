@@ -26,8 +26,8 @@ Limpieza completada y consultada en la base: cero cuentas temporales, cero fotos
 
 ## Alcance y pasos del titular
 
-- Activar la cuenta administradora autorizada y confirmar el correo. El ingreso con la cuenta temporal está probado; la entrega del mensaje de confirmación al correo del titular requiere su participación.
-- Para habilitar operadores por correo fuera del equipo de Supabase, configurar un servicio SMTP propio en Supabase Auth. El proveedor de correo incorporado de Supabase restringe los destinatarios y la frecuencia; no se configuró un servicio externo sin credenciales del titular. Referencia: https://supabase.com/docs/guides/auth/auth-smtp.
+- El administrador del titular ya está registrado y su correo confirmado. Cada operador debe ser autorizado desde Configuración y activar su propia cuenta.
+- Gmail SMTP configurado con puerto 465, nombre remitente UMBRA y contraseña de aplicación generada personalmente por el titular. Se verificó el envío de recuperación de Supabase y su llegada a la bandeja de entrada el 27/10/2026 a las 05:21 de Argentina. La contraseña de aplicación se guardó únicamente en Supabase; no está en GitHub ni en los archivos entregados. La prueba no cambió la contraseña de acceso del usuario.
 - Crear organizaciones y revisar precios/cupos; no se necesita stock inicial de UMBRA.
 - La importación histórica es opcional y no se ejecuta sobre los datos operativos durante las pruebas.
 - El asesor de seguridad de Supabase señala que la protección adicional contra contraseñas filtradas está desactivada. Supabase la ofrece desde el plan Pro: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection. Se exige contraseña de al menos 12 caracteres y correo confirmado. No se contrató un plan pago.

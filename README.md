@@ -36,6 +36,8 @@ Después, la persona utiliza **Activar cuenta autorizada** en el acceso, confirm
 
 Para enviar confirmaciones a operadores ajenos al equipo de Supabase hace falta un proveedor SMTP propio: el correo incorporado de Supabase restringe destinatarios y frecuencia. Configurarlo en Supabase Auth siguiendo https://supabase.com/docs/guides/auth/auth-smtp. No incluir claves SMTP en el frontend ni en GitHub.
 
+En UMBRA ya está configurado Gmail mediante `smtp.gmail.com:465`, con nombre remitente UMBRA y contraseña de aplicación. Se comprobó la llegada de un correo real de recuperación. Los operadores pueden activar sus cuentas después de que un administrador autorice su dirección. Para una futura aplicación de `supabase/config.toml`, proporcionar `UMBRA_SMTP_USER` y `UMBRA_SMTP_PASSWORD` en el entorno privado del administrador. No confundir estas variables del servidor con las variables públicas `VITE_*`.
+
 - Administradores: configuración, productos/precios, categorías/cupos, organizaciones/contactos y usuarios.
 - Operadores: registrar/editar/anular pedidos, consultar catálogo, organizaciones, límites, historial y reportes.
 - RLS protege todas las tablas. El bucket privado `product-photos` solo permite lectura a miembros autorizados y escritura a administradores.
