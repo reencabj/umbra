@@ -1,5 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
+import ExcelJS from "exceljs";
 test("live Supabase: dynamic products, private photos, sales, tickets, edits, shared quotas, weekly stock, reports and mobile", async ({
   page,
   context,
@@ -132,7 +133,11 @@ test("live Supabase: dynamic products, private photos, sales, tickets, edits, sh
   );
   const png = page.waitForEvent("download");
   await page.getByRole("button", { name: "PNG", exact: true }).click();
-  expect((await png).suggestedFilename()).toMatch(/\.png$/);
+  const pngFile = await png;
+  expect(pngFile.suggestedFilename()).toMatch(/\.png$/);
+  const pngBytes = await readFile((await pngFile.path())!);
+  expect(pngBytes.subarray(0, 8).toString("hex")).toBe("89504e470d0a1a0a");
+  expect(pngBytes.length).toBeGreaterThan(1000);
   await page.getByRole("button", { name: "Cerrar", exact: true }).click();
   await page.getByRole("link", { name: "Stock semanal", exact: true }).click();
   let row = page
@@ -216,10 +221,21 @@ test("live Supabase: dynamic products, private photos, sales, tickets, edits, sh
   await expect(page.locator(".report-preview")).toContainText("52.500");
   const csv = page.waitForEvent("download");
   await page.getByRole("button", { name: "Descargar CSV" }).click();
-  expect((await csv).suggestedFilename()).toMatch(/\.csv$/);
+  const csvFile = await csv;
+  expect(csvFile.suggestedFilename()).toMatch(/\.csv$/);
+  const csvContent = await readFile((await csvFile.path())!, "utf8");
+  expect(csvContent).toContain(org);
+  expect(csvContent).toContain('"52500"');
   const xlsx = page.waitForEvent("download");
   await page.getByRole("button", { name: "Descargar Excel" }).click();
-  expect((await xlsx).suggestedFilename()).toMatch(/\.xlsx$/);
+  const xlsxFile = await xlsx;
+  expect(xlsxFile.suggestedFilename()).toMatch(/\.xlsx$/);
+  const workbook = new ExcelJS.Workbook();
+  await workbook.xlsx.readFile((await xlsxFile.path())!);
+  const exportedRows: unknown[][] = [];
+  workbook.getWorksheet("Pedidos")!.eachRow((row) => exportedRows.push(row.values as unknown[]));
+  expect(exportedRows.some((row) => row.includes(org) && row.includes(52500))).toBeTruthy();
+  expect(workbook.getWorksheet("Productos")!.rowCount).toBeGreaterThan(1);
   await page.getByRole("link", { name: "Pedidos", exact: true }).click();
   await page
     .getByRole("row")

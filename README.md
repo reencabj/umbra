@@ -2,6 +2,10 @@
 
 Aplicación privada de operaciones para un servidor de GTA V Roleplay. React, Vite, TypeScript, Tailwind CSS, Lucide, Recharts y Supabase. Interfaz en español, tema oscuro, responsive y navegación mediante hash compatible con GitHub Pages.
 
+**Aplicación:** https://reencabj.github.io/umbra/ · **Repositorio:** https://github.com/reencabj/umbra
+
+Primero elegí **Primera vez · Activar cuenta autorizada**, usá el correo administrador autorizado durante la instalación y una contraseña propia de al menos 12 caracteres. Confirmá el correo antes de ingresar. El stock es el cupo semanal de cada banda; UMBRA tiene disponibilidad ilimitada.
+
 ## Ejecutar y verificar
 
 Requiere Node.js 24 y npm. Las versiones exactas y el árbol de dependencias están fijados en `package-lock.json`.
@@ -29,6 +33,8 @@ values (lower('TU_CORREO'), 'admin');
 ```
 
 Después, la persona utiliza **Activar cuenta autorizada** en el acceso, confirma su correo y entra con su contraseña. En Supabase Auth, configurar `Site URL` y las URLs de redirección permitidas con la URL de Pages y la URL local de desarrollo. Activar confirmación de correo. El resto de usuarios se autoriza desde Configuración. Un usuario no autorizado no puede crear perfil ni leer ventas.
+
+Para enviar confirmaciones a operadores ajenos al equipo de Supabase hace falta un proveedor SMTP propio: el correo incorporado de Supabase restringe destinatarios y frecuencia. Configurarlo en Supabase Auth siguiendo https://supabase.com/docs/guides/auth/auth-smtp. No incluir claves SMTP en el frontend ni en GitHub.
 
 - Administradores: configuración, productos/precios, categorías/cupos, organizaciones/contactos y usuarios.
 - Operadores: registrar/editar/anular pedidos, consultar catálogo, organizaciones, límites, historial y reportes.
