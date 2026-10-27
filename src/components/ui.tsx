@@ -10,12 +10,12 @@ import {
   CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
-import { db } from "../lib/supabase";
 import { money, ticket } from "../lib/domain";
 import { statusLabel } from "../lib/types";
 import type { Order } from "../lib/types";
 import { useApp } from "../state";
 import Logo from "./Logo";
+import { productPhotos } from "../lib/photos";
 export const errorMessage = (e: unknown) =>
   e instanceof Error
     ? e.message
@@ -171,23 +171,40 @@ export function Badge({ status }: { status: Order["status"] }) {
   );
 }
 export function Photo({ path, name }: { path: string | null; name: string }) {
-  const [url, setUrl] = useState("");
+  const { session } = useApp();
+  const key = `${session?.user.id || ""}:${path || ""}`;
+  const [photo, setPhoto] = useState(() => ({
+    key,
+    url: path ? productPhotos.peek(path) : "",
+  }));
   useEffect(() => {
     let alive = true;
-    setUrl("");
-    if (path)
-      db.storage
-        .from("product-photos")
-        .createSignedUrl(path, 3600)
-        .then(({ data }) => {
-          if (alive) setUrl(data?.signedUrl || "");
+    setPhoto({ key, url: path ? productPhotos.peek(path) : "" });
+    if (path && session)
+      void productPhotos
+        .get(path)
+        .then((url) => {
+          if (alive) setPhoto({ key, url });
+        })
+        .catch(() => {
+          if (alive) setPhoto({ key, url: "" });
         });
     return () => {
       alive = false;
     };
-  }, [path]);
+  }, [key]);
+  const url = photo.key === key ? photo.url : "";
   return url ? (
-    <img className="product-photo" src={url} alt={name} />
+    <img
+      className="product-photo"
+      src={url}
+      alt={name}
+      decoding="async"
+      onError={() => {
+        if (path) productPhotos.invalidate(path);
+        setPhoto({ key, url: "" });
+      }}
+    />
   ) : (
     <div className="product-placeholder">
       <Package size={26} />

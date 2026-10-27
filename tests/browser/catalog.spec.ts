@@ -1,7 +1,10 @@
 import { test, expect } from "@playwright/test";
 import { readFile } from "node:fs/promises";
 
-test.beforeEach(async ({ page }) => {
+let photoRequests: string[][] = [];
+test.beforeEach(async ({ page }, testInfo) => {
+  photoRequests = [];
+  const withPhotos = testInfo.title.includes("photo cache");
   test.skip(
     Boolean(process.env.E2E_URL),
     "Isolated UI fixtures only run locally.",
@@ -46,7 +49,7 @@ test.beforeEach(async ({ page }) => {
     category_id: "cat-" + [0, 0, 2, 1, 1, 3, 4][i],
     active: true,
     archived: false,
-    image_path: null,
+    image_path: withPhotos ? `products/fixture-${i}.webp` : null,
   }));
   const organizations = ["Families", "Requiem"].map((name, i) => ({
     id: "org-" + i,
@@ -150,9 +153,45 @@ test.beforeEach(async ({ page }) => {
           "access-control-allow-headers": "*",
         },
       });
+    const url = new URL(route.request().url());
+    if (
+      withPhotos &&
+      url.pathname.startsWith("/storage/v1/object/sign/product-photos") &&
+      route.request().method() === "POST"
+    ) {
+      const body = route.request().postDataJSON();
+      const paths: string[] = body.paths || [
+        url.pathname.split("/product-photos/")[1],
+      ];
+      photoRequests.push(paths);
+      const signed = paths.map((path) => ({
+        path,
+        signedURL: `/object/sign/product-photos/${path}?token=fixture-${photoRequests.length}`,
+        error: null,
+      }));
+      return route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(body.paths ? signed : signed[0]),
+      });
+    }
+    if (
+      withPhotos &&
+      url.pathname.startsWith("/storage/v1/object/sign/product-photos/") &&
+      route.request().method() === "GET"
+    ) {
+      return route.fulfill({
+        status: 200,
+        contentType: "image/png",
+        body: Buffer.from(
+          "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+aC4sAAAAASUVORK5CYII=",
+          "base64",
+        ),
+        headers: { "cache-control": "max-age=3600" },
+      });
+    }
     if (route.request().method() !== "GET")
       throw Error("Unexpected backend write in UI fixture");
-    const url = new URL(route.request().url());
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -163,6 +202,42 @@ test.beforeEach(async ({ page }) => {
       ),
     });
   });
+});
+
+test("photo cache batches seven items and reuses their URLs after navigation and reload", async ({
+  page,
+}) => {
+  await page.goto("./#/sales");
+  await expect(page.locator(".product-photo")).toHaveCount(7);
+  expect(photoRequests).toHaveLength(1);
+  expect(photoRequests[0]).toHaveLength(7);
+  const sources = await page
+    .locator(".product-photo")
+    .evaluateAll((images) =>
+      images.map((img) => (img as HTMLImageElement).src),
+    );
+  await page.getByRole("link", { name: "Productos", exact: true }).click();
+  await expect(page.locator(".product-photo")).toHaveCount(7);
+  await page.getByRole("link", { name: "Nueva venta", exact: true }).click();
+  await expect(page.locator(".product-photo")).toHaveCount(7);
+  expect(photoRequests).toHaveLength(1);
+  expect(
+    await page
+      .locator(".product-photo")
+      .evaluateAll((images) =>
+        images.map((img) => (img as HTMLImageElement).src),
+      ),
+  ).toEqual(sources);
+  await page.reload();
+  await expect(page.locator(".product-photo")).toHaveCount(7);
+  expect(photoRequests).toHaveLength(1);
+  expect(
+    await page
+      .locator(".product-photo")
+      .evaluateAll((images) =>
+        images.map((img) => (img as HTMLImageElement).src),
+      ),
+  ).toEqual(sources);
 });
 
 test("compact catalog blocks shared quota, typed overflow, combos and smaller organization allowances", async ({

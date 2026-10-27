@@ -19,7 +19,7 @@ npm run check
 npm run test:e2e
 ```
 
-`npm run check` ejecuta 18 pruebas unitarias, las invariantes PostgreSQL en PGlite y la compilación TypeScript/Vite. `npm run test:e2e` comprueba el acceso privado, la navegación responsive y el catálogo compacto con bloqueo preventivo de cupos. El caso E2E completo se habilita solo con `E2E_LIVE=1` y una cuenta temporal expresamente autorizada, suministrada localmente en `work/qa-account.json`. No se guardan credenciales de prueba en GitHub.
+`npm run check` ejecuta 25 pruebas unitarias, las invariantes PostgreSQL en PGlite y la compilación TypeScript/Vite. `npm run test:e2e` comprueba el acceso privado, la navegación responsive, los comprobantes PNG, la reutilización de fotos y el catálogo compacto con bloqueo preventivo de cupos. El caso E2E completo se habilita solo con `E2E_LIVE=1` y una cuenta temporal expresamente autorizada, suministrada localmente en `work/qa-account.json`. No se guardan credenciales de prueba en GitHub.
 
 ## Base de datos y seguridad
 

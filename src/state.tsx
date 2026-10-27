@@ -9,6 +9,7 @@ import type { ReactNode } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { Data, Profile } from "./lib/types";
 import { configured, db, rows } from "./lib/supabase";
+import { productPhotos } from "./lib/photos";
 interface State {
   session: Session | null;
   profile: Profile | null;
@@ -28,12 +29,14 @@ export function Provider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!configured) return;
     db.auth.getSession().then(({ data }) => {
+      productPhotos.setScope(data.session?.user.id || null);
       setSession(data.session);
       if (!data.session) setLoading(false);
     });
     const {
       data: { subscription },
     } = db.auth.onAuthStateChange((_e, s) => {
+      productPhotos.setScope(s?.user.id || null);
       setSession(s);
       if (!s) {
         setData(null);
@@ -54,6 +57,7 @@ export function Provider({ children }: { children: ReactNode }) {
         .maybeSingle();
       if (e) throw e;
       if (!p || !p.enabled) {
+        productPhotos.setScope(null);
         setData(null);
         setProfile(null);
         throw Error(
@@ -61,6 +65,7 @@ export function Provider({ children }: { children: ReactNode }) {
         );
       }
       setProfile(p);
+      productPhotos.setScope(session.user.id);
       const tables = [
         "settings",
         "categories",
@@ -79,6 +84,13 @@ export function Provider({ children }: { children: ReactNode }) {
       ];
       const all = await Promise.all(tables.map((t) => rows(t)));
       const mapped = Object.fromEntries(tables.map((t, i) => [t, all[i]]));
+      void productPhotos
+        .prefetch(
+          (mapped.products as Data["products"])
+            .filter((p) => p.active && !p.archived && p.image_path)
+            .map((p) => p.image_path!),
+        )
+        .catch(() => undefined);
       setData({
         settings: mapped.settings[0],
         categories: mapped.categories,

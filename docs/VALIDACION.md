@@ -2,6 +2,13 @@
 
 Fecha: 27/10/2026. Regla vigente confirmada por el usuario: UMBRA tiene disponibilidad ilimitada; el stock es el cupo semanal de cada banda.
 
+## Carga de fotografías
+
+- Las siete fotos operativas ya estaban optimizadas a WebP y sumaban unos 18 KB. Cada montaje del componente solicitaba un enlace firmado por foto, cambiando la URL de caché. La prueba local reprodujo 14 peticiones individuales durante el montaje con React StrictMode.
+- Se agrupan las firmas en una solicitud, se deduplican pedidos simultáneos y se reutilizan los enlaces durante 55 minutos. La caché de la pestaña sobrevive a recargas, pertenece al usuario actual y se elimina al cerrar sesión. Los enlaces se renuevan antes de vencer; una foto reemplazada tiene una ruta nueva.
+- Regresión verificada: siete fotos usan una solicitud inicial y ninguna firma adicional al ir a Productos, volver a Nueva venta y recargar. Las direcciones se mantienen iguales para aprovechar la caché del navegador. No se midió una reducción exacta en segundos sobre la conexión del titular.
+- Pasaron 25 pruebas unitarias y seis pruebas locales de navegador. Se cubren expiración, fallos recuperables, almacenamiento bloqueado, aislamiento de usuarios y descarte de respuestas de sesiones anteriores. La prueba que crea datos reales no se ejecutó en esta revisión.
+
 ## Revisión visual y de cupos
 
 - Logo original del titular incorporado, conservando transparencia y proporciones, en acceso, recuperación, barra lateral, cabecera móvil, comprobantes y sus PNG, favicon y acceso directo móvil. Cinco pruebas de navegador locales pasaron; incluyen carga real de la imagen, ruta del favicon y exportación PNG con logo.
@@ -41,3 +48,4 @@ Limpieza completada y consultada en la base: cero cuentas temporales, cero fotos
 - La importación histórica es opcional y no se ejecuta sobre los datos operativos durante las pruebas.
 - El asesor de seguridad de Supabase señala que la protección adicional contra contraseñas filtradas está desactivada. Supabase la ofrece desde el plan Pro: https://supabase.com/docs/guides/auth/password-security#password-strength-and-leaked-password-protection. Se exige contraseña de al menos 12 caracteres y correo confirmado. No se contrató un plan pago.
 - Las tablas antiguas de existencias físicas se conservan por compatibilidad y auditoría, pero no limitan nuevas ventas ni se ofrecen en la operación actual.
+
