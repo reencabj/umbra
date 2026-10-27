@@ -2765,10 +2765,7 @@ nav a.active {
   width: 100%;
   max-width: 440px;
   padding: 34px 36px 26px;
-  border: 1px solid #2d2d2d;
-  border-radius: 14px;
-  background: #141414;
-  box-shadow: 0 16px 48px #00000020;
+  background: transparent;
 }
 .auth-header {
   display: flex;
@@ -2948,3 +2945,4 @@ nav a.active {
     align-items: center;
   }
 }
+
